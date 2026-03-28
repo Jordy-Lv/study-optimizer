@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: study-optimizer
+
+  datasource:
+    # Valores por defecto para desarrollo local (coinciden con docker-compose.yml).
+    # En produccion se inyectan por variables de entorno, nunca se hardcodean.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/study_optimizer}
+    username: ${DB_USERNAME:study}
+    password: ${DB_PASSWORD:study}
+
+  jpa:
+    hibernate:
+      # validate: Hibernate solo verifica que el esquema (creado por Flyway)
+      # coincida con las entidades. Flyway es el unico dueno del esquema.
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+# Muestra el SQL que ejecuta Hibernate (util para aprender)
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+server:
+  port: 8080
+
+# Integracion con GitHub (milestone 10). Los defaults dejan la demo funcionando
+# sin configurar nada; en uso real se apunta al repo propio con las variables de
+# entorno GITHUB_OWNER / GITHUB_REPO (o ?owner=&repo= por peticion). El token es
+# opcional y secreto: se pasa por GITHUB_TOKEN, nunca se hardcodea en el codigo.
+github:
+  api-url: ${GITHUB_API_URL:https://api.github.com}
+  owner: ${GITHUB_OWNER:mouredev}
+  repo: ${GITHUB_REPO:retos-programacion-2023}
+  token: ${GITHUB_TOKEN:}

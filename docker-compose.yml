@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: study-optimizer-db
+    environment:
+      POSTGRES_DB: study_optimizer
+      POSTGRES_USER: study
+      POSTGRES_PASSWORD: study
+    ports:
+      - "5432:5432"
+    volumes:
+      - study_optimizer_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U study -d study_optimizer"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  study_optimizer_data:
