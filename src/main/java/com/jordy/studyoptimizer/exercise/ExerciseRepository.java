@@ -15,9 +15,11 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 
     List<Exercise> findByPhaseOrderByDayNumber(Integer phase);
 
-    // Busca un reto por su numero de dia (1..30). Lo usa la integracion con
-    // GitHub para mapear "Reto 9" del mensaje del commit al reto concreto.
+    // Busca un reto por su numero/orden. Lo usa la integracion con GitHub para
+    // mapear "Reto 9" del mensaje del commit al reto concreto.
     Optional<Exercise> findByDayNumber(Integer dayNumber);
+
+    Optional<Exercise> findTopByOrderByDayNumberDesc();
 
     List<Exercise> findByDoneOrderByDayNumber(boolean done);
 

@@ -1,12 +1,18 @@
 package com.jordy.studyoptimizer.exercise;
 
 import com.jordy.studyoptimizer.concept.dto.AttachConceptsRequest;
+import com.jordy.studyoptimizer.exercise.dto.CreateExerciseRequest;
 import com.jordy.studyoptimizer.exercise.dto.ExerciseResponse;
 import com.jordy.studyoptimizer.exercise.dto.SetEstimateRequest;
 import com.jordy.studyoptimizer.exercise.dto.TimeComparisonResponse;
+import com.jordy.studyoptimizer.exercise.dto.UpdateExerciseRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,6 +34,25 @@ public class ExerciseController {
     @GetMapping("/{id}")
     public ExerciseResponse get(@PathVariable Long id) {
         return service.get(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<ExerciseResponse> create(@Valid @RequestBody CreateExerciseRequest req,
+                                                   UriComponentsBuilder uri) {
+        ExerciseResponse created = service.create(req);
+        URI location = uri.path("/api/exercises/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ExerciseResponse update(@PathVariable Long id, @Valid @RequestBody UpdateExerciseRequest req) {
+        return service.update(id, req);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 
     @PatchMapping("/{id}/done")

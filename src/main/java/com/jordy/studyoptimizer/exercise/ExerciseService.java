@@ -1,11 +1,14 @@
 package com.jordy.studyoptimizer.exercise;
 
+import com.jordy.studyoptimizer.common.exception.DuplicateResourceException;
 import com.jordy.studyoptimizer.common.exception.ResourceNotFoundException;
 import com.jordy.studyoptimizer.concept.Concept;
 import com.jordy.studyoptimizer.concept.ConceptService;
 import com.jordy.studyoptimizer.concept.dto.ConceptResponse;
+import com.jordy.studyoptimizer.exercise.dto.CreateExerciseRequest;
 import com.jordy.studyoptimizer.exercise.dto.ExerciseResponse;
 import com.jordy.studyoptimizer.exercise.dto.TimeComparisonResponse;
+import com.jordy.studyoptimizer.exercise.dto.UpdateExerciseRequest;
 import com.jordy.studyoptimizer.session.ExerciseMinutesView;
 import com.jordy.studyoptimizer.session.SessionRepository;
 import org.springframework.data.domain.Sort;
@@ -45,6 +48,41 @@ public class ExerciseService {
         return toResponse(findOrThrow(id));
     }
 
+    /** Crea un reto propio del usuario. Los 30 de mouredev son solo seed inicial. */
+    public ExerciseResponse create(CreateExerciseRequest req) {
+        Integer dayNumber = req.dayNumber() == null ? nextDayNumber() : req.dayNumber();
+        ensureDayNumberAvailable(dayNumber, null);
+
+        Exercise e = new Exercise();
+        e.setDayNumber(dayNumber);
+        e.setTitle(req.title().trim());
+        e.setDescription(req.description());
+        e.setPhase(req.phase() == null ? 1 : req.phase());
+        e.setEstimatedMinutes(req.estimatedMinutes());
+        attachConceptEntities(e, req.conceptIds());
+
+        return toResponse(repository.save(e));
+    }
+
+    /** Edita los datos principales de un reto, sea del seed inicial o creado por el usuario. */
+    public ExerciseResponse update(Long id, UpdateExerciseRequest req) {
+        Exercise e = findOrThrow(id);
+        Integer dayNumber = req.dayNumber() == null ? e.getDayNumber() : req.dayNumber();
+        ensureDayNumberAvailable(dayNumber, id);
+
+        e.setDayNumber(dayNumber);
+        e.setTitle(req.title().trim());
+        e.setDescription(req.description());
+        e.setPhase(req.phase() == null ? e.getPhase() : req.phase());
+
+        return toResponse(e);
+    }
+
+    public void delete(Long id) {
+        Exercise e = findOrThrow(id);
+        repository.delete(e);
+    }
+
     @Transactional(readOnly = true)
     public List<ExerciseResponse> byPhase(Integer phase) {
         return repository.findByPhaseOrderByDayNumber(phase).stream()
@@ -73,10 +111,7 @@ public class ExerciseService {
     /** Asocia conceptos a un reto (escribe en la tabla puente exercise_concept). */
     public ExerciseResponse attachConcepts(Long id, List<Long> conceptIds) {
         Exercise e = findOrThrow(id);
-        for (Long conceptId : conceptIds) {
-            Concept c = conceptService.findOrThrow(conceptId);
-            e.getConcepts().add(c);
-        }
+        attachConceptEntities(e, conceptIds);
         return toResponse(e);
     }
 
@@ -91,6 +126,31 @@ public class ExerciseService {
     public Exercise findOrThrow(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("Reto", id));
+    }
+
+    private void attachConceptEntities(Exercise exercise, List<Long> conceptIds) {
+        if (conceptIds == null) {
+            return;
+        }
+        for (Long conceptId : conceptIds) {
+            Concept c = conceptService.findOrThrow(conceptId);
+            exercise.getConcepts().add(c);
+        }
+    }
+
+    private Integer nextDayNumber() {
+        return repository.findTopByOrderByDayNumberDesc()
+                .map(Exercise::getDayNumber)
+                .map(n -> n + 1)
+                .orElse(1);
+    }
+
+    private void ensureDayNumberAvailable(Integer dayNumber, Long currentId) {
+        repository.findByDayNumber(dayNumber)
+                .filter(existing -> currentId == null || !existing.getId().equals(currentId))
+                .ifPresent(existing -> {
+                    throw new DuplicateResourceException("Ya existe un reto con numero " + dayNumber);
+                });
     }
 
     /** Mapea la entidad (con sus conceptos) al DTO de salida. */
