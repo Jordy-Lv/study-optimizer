@@ -18,7 +18,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      *  - resolved: true = resueltos (resolved_at no nulo), false = abiertos.
      *
      * Es un LIKE simple, sin subquery que devuelva la entidad, asi que no cae
-     * en el bug de reescritura de JPQL anotado en CLAUDE.md (milestone 2).
+     * en el bug de reescritura de JPQL detectado en la milestone 2.
      */
     @Query("""
             select e from ErrorLog e
