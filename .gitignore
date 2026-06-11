@@ -17,3 +17,6 @@ target/
 
 ### Logs ###
 *.log
+
+### Frontend (solo prueba local, el repo es backend/API REST Spring Boot) ###
+frontend/
