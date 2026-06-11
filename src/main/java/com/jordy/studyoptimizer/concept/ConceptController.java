@@ -61,7 +61,7 @@ public class ConceptController {
         conceptService.delete(id);
     }
 
-    /** Que retos practican este concepto (recorre la relacion N:M). */
+    /** Que ejercicios practican este concepto (recorre la relacion N:M). */
     @GetMapping("/{id}/exercises")
     public List<ExerciseResponse> exercises(@PathVariable Long id) {
         return exerciseService.byConcept(id);

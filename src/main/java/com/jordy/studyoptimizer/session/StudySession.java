@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Una sesion de estudio: cuanto tiempo, que tan dificil se sintio y notas.
- * Puede estar ligada a un reto concreto (o no, si fue estudio libre).
+ * Puede estar ligada a un ejercicio concreto (o no, si fue estudio libre).
  */
 @Entity
 @Table(name = "study_session")
@@ -27,8 +27,8 @@ public class StudySession {
     private Long id;
 
     /**
-     * Muchas sesiones pueden apuntar a un mismo reto (N:1). LAZY para no
-     * traer el reto entero salvo que lo pidamos.
+     * Muchas sesiones pueden apuntar a un mismo ejercicio (N:1). LAZY para no
+     * traer el ejercicio entero salvo que lo pidamos.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id")

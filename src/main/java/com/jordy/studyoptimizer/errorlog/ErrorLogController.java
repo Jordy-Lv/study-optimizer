@@ -34,7 +34,7 @@ public class ErrorLogController {
     /**
      * Lista/busca errores. Todos los filtros son opcionales y se combinan:
      *   ?q=texto         busca en titulo, descripcion y solucion
-     *   ?exerciseId=3    solo errores de ese reto
+     *   ?exerciseId=3    solo errores de ese ejercicio
      *   ?resolved=false  solo abiertos (true = solo resueltos)
      */
     @GetMapping

@@ -18,7 +18,6 @@ public record CreateSessionRequest(
         @Min(value = 1, message = "la sesion debe durar al menos 1 minuto")
         Integer minutes,
 
-        @NotNull(message = "la dificultad es obligatoria")
         @Min(value = 1, message = "la dificultad minima es 1")
         @Max(value = 5, message = "la dificultad maxima es 5")
         Integer difficulty,

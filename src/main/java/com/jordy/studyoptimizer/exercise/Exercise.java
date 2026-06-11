@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Un reto de los 30 de mouredev. Su esquema lo crea Flyway (V1).
+ * Un ejercicio. Su esquema lo crea Flyway (V1).
  *
  * Nota sobre Lombok: @Getter/@Setter generan los metodos de acceso en
  * tiempo de compilacion para no llenar la clase de boilerplate. No usamos
@@ -47,19 +47,11 @@ public class Exercise {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    /**
-     * Tiempo estimado para el reto, en minutos (milestone 8). Es opcional:
-     * null mientras no se haya estimado. El tiempo REAL no se guarda aqui,
-     * se calcula sumando los minutos de las sesiones del reto.
-     */
-    @Column(name = "estimated_minutes")
-    private Integer estimatedMinutes;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     /**
-     * Conceptos que practica este reto. Relacion N:M materializada en la
+     * Conceptos que practica este ejercicio. Relacion N:M materializada en la
      * tabla puente exercise_concept (migracion V3). Es el lado "dueno" de
      * la relacion: este es quien escribe en la tabla puente.
      */

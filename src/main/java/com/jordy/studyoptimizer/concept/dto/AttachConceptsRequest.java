@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
- * Cuerpo para asociar uno o varios conceptos a un reto o sesion.
+ * Cuerpo para asociar uno o varios conceptos a un ejercicio o sesion.
  * Se reutiliza desde exercise y session.
  */
 public record AttachConceptsRequest(

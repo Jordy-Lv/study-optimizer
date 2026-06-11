@@ -30,13 +30,3 @@ logging:
 
 server:
   port: 8080
-
-# Integracion con GitHub (milestone 10). Los defaults dejan la demo funcionando
-# sin configurar nada; en uso real se apunta al repo propio con las variables de
-# entorno GITHUB_OWNER / GITHUB_REPO (o ?owner=&repo= por peticion). El token es
-# opcional y secreto: se pasa por GITHUB_TOKEN, nunca se hardcodea en el codigo.
-github:
-  api-url: ${GITHUB_API_URL:https://api.github.com}
-  owner: ${GITHUB_OWNER:mouredev}
-  repo: ${GITHUB_REPO:retos-programacion-2023}
-  token: ${GITHUB_TOKEN:}

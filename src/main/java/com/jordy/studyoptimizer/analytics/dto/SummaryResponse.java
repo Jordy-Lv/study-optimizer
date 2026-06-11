@@ -7,6 +7,8 @@ public record SummaryResponse(
         long totalSessions,
         long distinctDays,
         long pomodoros,
-        double avgDifficulty
+        double avgDifficulty,
+        long totalExercises,
+        long completedExercises
 ) {
 }

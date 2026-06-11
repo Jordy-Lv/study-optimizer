@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Un error/bug encontrado mientras se resolvia un reto, con su descripcion y
+ * Un error/bug encontrado mientras se resolvia un ejercicio, con su descripcion y
  * (cuando se resuelve) la solucion. Su esquema lo crea Flyway (V7).
  *
  * El estado "resuelto" NO se guarda como booleano aparte: se deriva de
@@ -37,8 +37,8 @@ public class ErrorLog {
     private String solution;
 
     /**
-     * Reto en el que aparecio el error (opcional). ManyToOne perezoso: el lado
-     * "muchos" guarda la FK exercise_id. Si el reto se borra, esta FK queda en
+     * Ejercicio en el que aparecio el error (opcional). ManyToOne perezoso: el lado
+     * "muchos" guarda la FK exercise_id. Si el ejercicio se borra, esta FK queda en
      * null (ON DELETE SET NULL en la migracion).
      */
     @ManyToOne(fetch = FetchType.LAZY)

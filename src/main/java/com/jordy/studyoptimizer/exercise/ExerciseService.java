@@ -7,18 +7,12 @@ import com.jordy.studyoptimizer.concept.ConceptService;
 import com.jordy.studyoptimizer.concept.dto.ConceptResponse;
 import com.jordy.studyoptimizer.exercise.dto.CreateExerciseRequest;
 import com.jordy.studyoptimizer.exercise.dto.ExerciseResponse;
-import com.jordy.studyoptimizer.exercise.dto.TimeComparisonResponse;
 import com.jordy.studyoptimizer.exercise.dto.UpdateExerciseRequest;
-import com.jordy.studyoptimizer.session.ExerciseMinutesView;
-import com.jordy.studyoptimizer.session.SessionRepository;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,14 +20,11 @@ public class ExerciseService {
 
     private final ExerciseRepository repository;
     private final ConceptService conceptService;
-    private final SessionRepository sessionRepository;
 
     public ExerciseService(ExerciseRepository repository,
-                           ConceptService conceptService,
-                           SessionRepository sessionRepository) {
+                           ConceptService conceptService) {
         this.repository = repository;
         this.conceptService = conceptService;
-        this.sessionRepository = sessionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +39,7 @@ public class ExerciseService {
         return toResponse(findOrThrow(id));
     }
 
-    /** Crea un reto propio del usuario. Los 30 de mouredev son solo seed inicial. */
+    /** Crea un ejercicio propio del usuario. Los de ejemplo son solo seed inicial. */
     public ExerciseResponse create(CreateExerciseRequest req) {
         Integer dayNumber = req.dayNumber() == null ? nextDayNumber() : req.dayNumber();
         ensureDayNumberAvailable(dayNumber, null);
@@ -58,13 +49,12 @@ public class ExerciseService {
         e.setTitle(req.title().trim());
         e.setDescription(req.description());
         e.setPhase(req.phase() == null ? 1 : req.phase());
-        e.setEstimatedMinutes(req.estimatedMinutes());
         attachConceptEntities(e, req.conceptIds());
 
         return toResponse(repository.save(e));
     }
 
-    /** Edita los datos principales de un reto, sea del seed inicial o creado por el usuario. */
+    /** Edita los datos principales de un ejercicio, sea del seed inicial o creado por el usuario. */
     public ExerciseResponse update(Long id, UpdateExerciseRequest req) {
         Exercise e = findOrThrow(id);
         Integer dayNumber = req.dayNumber() == null ? e.getDayNumber() : req.dayNumber();
@@ -98,7 +88,7 @@ public class ExerciseService {
                 .toList();
     }
 
-    /** Marca un reto como hecho (idempotente: si ya estaba, conserva la fecha). */
+    /** Marca un ejercicio como hecho (idempotente: si ya estaba, conserva la fecha). */
     public ExerciseResponse markDone(Long id) {
         Exercise e = findOrThrow(id);
         if (!e.isDone()) {
@@ -108,14 +98,14 @@ public class ExerciseService {
         return toResponse(e);
     }
 
-    /** Asocia conceptos a un reto (escribe en la tabla puente exercise_concept). */
+    /** Asocia conceptos a un ejercicio (escribe en la tabla puente exercise_concept). */
     public ExerciseResponse attachConcepts(Long id, List<Long> conceptIds) {
         Exercise e = findOrThrow(id);
         attachConceptEntities(e, conceptIds);
         return toResponse(e);
     }
 
-    /** Quita un concepto de un reto. */
+    /** Quita un concepto de un ejercicio. */
     public ExerciseResponse detachConcept(Long id, Long conceptId) {
         Exercise e = findOrThrow(id);
         e.getConcepts().removeIf(c -> c.getId().equals(conceptId));
@@ -125,7 +115,7 @@ public class ExerciseService {
     @Transactional(readOnly = true)
     public Exercise findOrThrow(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> ResourceNotFoundException.of("Reto", id));
+                .orElseThrow(() -> ResourceNotFoundException.of("Ejercicio", id));
     }
 
     private void attachConceptEntities(Exercise exercise, List<Long> conceptIds) {
@@ -149,7 +139,7 @@ public class ExerciseService {
         repository.findByDayNumber(dayNumber)
                 .filter(existing -> currentId == null || !existing.getId().equals(currentId))
                 .ifPresent(existing -> {
-                    throw new DuplicateResourceException("Ya existe un reto con numero " + dayNumber);
+                    throw new DuplicateResourceException("Ya existe un ejercicio con numero " + dayNumber);
                 });
     }
 
@@ -166,61 +156,7 @@ public class ExerciseService {
                 e.getPhase(),
                 e.isDone(),
                 e.getCompletedAt(),
-                e.getEstimatedMinutes(),
                 concepts
-        );
-    }
-
-    // --- Milestone 8: estimado vs real -------------------------------------
-
-    /** Fija (o actualiza) el tiempo estimado de un reto, en minutos. */
-    public ExerciseResponse setEstimate(Long id, Integer estimatedMinutes) {
-        Exercise e = findOrThrow(id);
-        e.setEstimatedMinutes(estimatedMinutes);
-        return toResponse(e);
-    }
-
-    /** Estimado vs real de un reto. El real es la suma de minutos de sus sesiones. */
-    @Transactional(readOnly = true)
-    public TimeComparisonResponse timeComparison(Long id) {
-        Exercise e = findOrThrow(id);
-        long actual = sessionRepository.sumMinutesByExerciseId(id);
-        return buildComparison(e, actual);
-    }
-
-    /**
-     * Comparacion de todos los retos que ya tienen estimacion. Una sola consulta
-     * agrupada trae los minutos reales por reto (evita N+1) y se cruzan en memoria.
-     */
-    @Transactional(readOnly = true)
-    public List<TimeComparisonResponse> timeComparisons() {
-        Map<Long, Long> realByExercise = sessionRepository.sumMinutesGroupedByExercise().stream()
-                .collect(Collectors.toMap(ExerciseMinutesView::getExerciseId, ExerciseMinutesView::getMinutes));
-        return repository.findAll(Sort.by("dayNumber")).stream()
-                .filter(e -> e.getEstimatedMinutes() != null)
-                .map(e -> buildComparison(e, realByExercise.getOrDefault(e.getId(), 0L)))
-                .toList();
-    }
-
-    /** Calcula diferencia y desviacion (no se persisten: son metricas derivadas). */
-    private static TimeComparisonResponse buildComparison(Exercise e, long actualMinutes) {
-        Integer estimated = e.getEstimatedMinutes();
-        Integer difference = null;
-        Integer deviationPercent = null;
-        if (estimated != null) {
-            difference = (int) (actualMinutes - estimated);
-            if (estimated != 0) {
-                deviationPercent = (int) Math.round((actualMinutes - estimated) * 100.0 / estimated);
-            }
-        }
-        return new TimeComparisonResponse(
-                e.getId(),
-                e.getDayNumber(),
-                e.getTitle(),
-                estimated,
-                actualMinutes,
-                difference,
-                deviationPercent
         );
     }
 }

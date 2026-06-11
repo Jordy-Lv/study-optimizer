@@ -92,7 +92,7 @@ public class ErrorLogService {
                 .orElseThrow(() -> ResourceNotFoundException.of("Error", id));
     }
 
-    /** Resuelve el reto opcional; lanza 404 si se pasa un id que no existe. */
+    /** Resuelve el ejercicio opcional; lanza 404 si se pasa un id que no existe. */
     private Exercise resolveExercise(Long exerciseId) {
         if (exerciseId == null) {
             return null;

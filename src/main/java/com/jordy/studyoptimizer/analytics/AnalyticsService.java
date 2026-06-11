@@ -3,6 +3,7 @@ package com.jordy.studyoptimizer.analytics;
 import com.jordy.studyoptimizer.analytics.dto.ExerciseStatsResponse;
 import com.jordy.studyoptimizer.analytics.dto.SummaryResponse;
 import com.jordy.studyoptimizer.analytics.dto.WeeklyStatsResponse;
+import com.jordy.studyoptimizer.exercise.ExerciseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,21 +17,27 @@ public class AnalyticsService {
     private static final int POMODORO_MINUTES = 25;
 
     private final AnalyticsRepository repository;
+    private final ExerciseRepository exerciseRepository;
 
-    public AnalyticsService(AnalyticsRepository repository) {
+    public AnalyticsService(AnalyticsRepository repository, ExerciseRepository exerciseRepository) {
         this.repository = repository;
+        this.exerciseRepository = exerciseRepository;
     }
 
     public SummaryResponse summary() {
         var p = repository.summary();
         long minutes = nz(p.getTotalMinutes());
+        long totalExercises = exerciseRepository.count();
+        long completedExercises = exerciseRepository.countByDone(true);
         return new SummaryResponse(
                 minutes,
                 toHours(minutes),
                 nz(p.getTotalSessions()),
                 nz(p.getDistinctDays()),
                 toPomodoros(minutes),
-                round1(p.getAvgDifficulty())
+                round1(p.getAvgDifficulty()),
+                totalExercises,
+                completedExercises
         );
     }
 

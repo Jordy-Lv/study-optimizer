@@ -30,7 +30,7 @@ public class SessionController {
         return ResponseEntity.created(location).body(created);
     }
 
-    /** Lista sesiones; opcionalmente filtra por reto con ?exerciseId=3 */
+    /** Lista sesiones; opcionalmente filtra por ejercicio con ?exerciseId=3 */
     @GetMapping
     public List<SessionResponse> list(@RequestParam(required = false) Long exerciseId) {
         return service.list(exerciseId);

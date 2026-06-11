@@ -1,5 +1,5 @@
--- Carga inicial de los 30 retos de mouredev.
--- Agrupados en 6 fases de 5 retos cada una, de menor a mayor dificultad.
+-- Carga inicial de ejercicios de ejemplo.
+-- Agrupados en 6 fases de 5 ejercicios cada una, de menor a mayor dificultad.
 
 INSERT INTO exercise (day_number, title, description, phase) VALUES
 -- Fase 1: Fundamentos

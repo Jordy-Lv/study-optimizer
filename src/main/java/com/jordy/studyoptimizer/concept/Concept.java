@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * su propia fecha de proximo repaso.
  *
  * No declara la relacion N:M hacia exercise/session: las tablas puente las
- * "poseen" Exercise y StudySession. Para consultar "que retos usan este
+ * "poseen" Exercise y StudySession. Para consultar "que ejercicios usan este
  * concepto" usamos una query en ExerciseRepository, evitando relaciones
  * bidireccionales que complican la serializacion.
  */

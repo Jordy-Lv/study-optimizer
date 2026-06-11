@@ -14,7 +14,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      *       Llega como cadena vacia cuando no se busca: el LIKE '%%' hace match
      *       con todo. (Pasar null romperia en Postgres: no puede inferir el tipo
      *       del parametro y lo trata como bytea → "function lower(bytea)...".)
-     *  - exerciseId: solo errores de ese reto (null = todos).
+     *  - exerciseId: solo errores de ese ejercicio (null = todos).
      *  - resolved: true = resueltos (resolved_at no nulo), false = abiertos.
      *
      * Es un LIKE simple, sin subquery que devuelva la entidad, asi que no cae

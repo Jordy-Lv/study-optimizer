@@ -6,11 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Edicion de los datos principales de un reto. El estimado se mantiene en su
- * endpoint dedicado PATCH /api/exercises/{id}/estimate.
+ * Edicion de los datos principales de un ejercicio.
  */
 public record UpdateExerciseRequest(
-        @Min(value = 1, message = "el numero de reto debe ser mayor o igual a 1")
+        @Min(value = 1, message = "el numero de ejercicio debe ser mayor o igual a 1")
         Integer dayNumber,
 
         @NotBlank(message = "el titulo es obligatorio")

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Lo que la API devuelve sobre un reto. Es un record (inmutable) para no
+ * Lo que la API devuelve sobre un ejercicio. Es un record (inmutable) para no
  * exponer la entidad JPA directamente al exterior.
  */
 public record ExerciseResponse(
@@ -17,7 +17,6 @@ public record ExerciseResponse(
         Integer phase,
         boolean done,
         LocalDateTime completedAt,
-        Integer estimatedMinutes,
         List<ConceptResponse> concepts
 ) {
 }

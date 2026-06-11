@@ -31,7 +31,7 @@ public class AnalyticsController {
         return service.weekly();
     }
 
-    /** Tiempo de estudio agregado por reto. */
+    /** Tiempo de estudio agregado por ejercicio. */
     @GetMapping("/by-exercise")
     public List<ExerciseStatsResponse> byExercise() {
         return service.byExercise();

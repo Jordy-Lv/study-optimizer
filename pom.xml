@@ -64,14 +64,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Generacion de PDF (reporte de progreso). OpenPDF es el fork libre
-             de iText (LGPL/MPL), sin las restricciones AGPL de iText 7. -->
-        <dependency>
-            <groupId>com.github.librepdf</groupId>
-            <artifactId>openpdf</artifactId>
-            <version>1.4.2</version>
-        </dependency>
-
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

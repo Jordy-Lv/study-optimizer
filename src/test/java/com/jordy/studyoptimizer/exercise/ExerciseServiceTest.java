@@ -5,7 +5,6 @@ import com.jordy.studyoptimizer.concept.ConceptService;
 import com.jordy.studyoptimizer.exercise.dto.CreateExerciseRequest;
 import com.jordy.studyoptimizer.exercise.dto.ExerciseResponse;
 import com.jordy.studyoptimizer.exercise.dto.UpdateExerciseRequest;
-import com.jordy.studyoptimizer.session.SessionRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -20,8 +19,7 @@ class ExerciseServiceTest {
 
     private final ExerciseRepository repository = mock(ExerciseRepository.class);
     private final ConceptService conceptService = mock(ConceptService.class);
-    private final SessionRepository sessionRepository = mock(SessionRepository.class);
-    private final ExerciseService service = new ExerciseService(repository, conceptService, sessionRepository);
+    private final ExerciseService service = new ExerciseService(repository, conceptService);
 
     @Test
     void createAssignsNextDayNumberWhenMissing() {
@@ -34,18 +32,16 @@ class ExerciseServiceTest {
 
         CreateExerciseRequest request = new CreateExerciseRequest(
                 null,
-                "Mi reto personal",
+                "Mi ejercicio personal",
                 "Practicar APIs REST",
                 null,
-                45,
                 null);
 
         ExerciseResponse created = service.create(request);
 
         assertThat(created.dayNumber()).isEqualTo(31);
         assertThat(created.phase()).isEqualTo(1);
-        assertThat(created.estimatedMinutes()).isEqualTo(45);
-        assertThat(created.title()).isEqualTo("Mi reto personal");
+        assertThat(created.title()).isEqualTo("Mi ejercicio personal");
     }
 
     @Test
@@ -58,10 +54,9 @@ class ExerciseServiceTest {
 
         CreateExerciseRequest request = new CreateExerciseRequest(
                 7,
-                "Otro reto",
+                "Otro ejercicio",
                 null,
                 2,
-                null,
                 null);
 
         assertThatThrownBy(() -> service.create(request))
